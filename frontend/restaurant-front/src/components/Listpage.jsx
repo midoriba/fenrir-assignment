@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios"
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link} from "react-router-dom";
 import "../css/main.css"
 
 const GenreCard = (props) => {
@@ -51,12 +51,14 @@ const GenreSelectButton = ({genres, onSelectedGenreChange}) => {
 
 const ShopCard = (props) => {
     const shop = props.shop
+    console.log(JSON.stringify(props.shop))
     return (
         <div className="shop-card">
             <p className="shop-name">{shop.name}</p>
             <img className="shop-image" src={shop.image} alt={shop.name+'の画像'}/>
             <p className="shop-opening-time">営業時間：{shop.opening_time}</p>
-            <p className="shop-address">住所：{shop.address}</p>
+            <p className="shop-address">アクセス：{shop.access}</p>
+            <Link to={`/detail/${shop.id}`}>詳細</Link>
         </div>
     )
 }
@@ -83,6 +85,7 @@ const ListPage = () => {
             }
         })
         .then((response) => {
+            console.log(JSON.stringify(response.data.shops))
             setShops(response.data.shops)
             setGenres(response.data.genres)
             setGenreVisibility(() => {

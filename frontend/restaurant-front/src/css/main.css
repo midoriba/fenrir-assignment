@@ -20,7 +20,6 @@
     justify-content: center;
     flex-direction: column;
     align-items: center;
-
 }
 
 .search-heading {
@@ -87,6 +86,10 @@
 
 .invisible {
     visibility: hidden;
+}
+
+.shop-detail {
+    padding: 20px 20px;
 }
 
 .header {

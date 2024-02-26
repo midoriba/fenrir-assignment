@@ -38,6 +38,7 @@ async def get_local_gourmet(latitude: float, longitude: float, search_range: int
     shops = []
     for shop in response_tree.findall("./hp:shop", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}):
         shops.append({
+            "id": shop.find("hp:id", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
             "name": shop.find("hp:name", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
             "address": shop.find("hp:address", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
             "opening_time": shop.find("hp:open", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
@@ -46,8 +47,9 @@ async def get_local_gourmet(latitude: float, longitude: float, search_range: int
             "image": shop.find("hp:photo/hp:pc/hp:l", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
             "genre": {
                 "name": shop.find("hp:genre/hp:name", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
-                "catch": shop.find("hp:genre/hp:catch", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
-            }
+                "catch": shop.find("hp:genre/hp:catch", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text
+            },
+            "access": shop.find("hp:access", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text
         })
     genre_counts = dict()
     for shop in shops:
@@ -63,4 +65,27 @@ async def get_local_gourmet(latitude: float, longitude: float, search_range: int
     }
     return result
 
-    
+@app.get("/local-gourmet/{id}")
+async def get_detail(id):
+    params = {
+        "key": HOTPEPPER_API_KEY,
+        "id": id
+    }
+    response = rq.get(GOURMET_API_URL, params=params).text
+    response_tree = ET.fromstring(response)
+
+    shop = response_tree.findall("./hp:shop", {"hp": "http://webservice.recruit.co.jp/HotPepper/"})[0]
+    return {
+            "id": shop.find("hp:id", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "name": shop.find("hp:name", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "address": shop.find("hp:address", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "opening_time": shop.find("hp:open", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "catch": shop.find("hp:catch", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "opening_time": shop.find("hp:open", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "image": shop.find("hp:photo/hp:pc/hp:l", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+            "genre": {
+                "name": shop.find("hp:genre/hp:name", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text,
+                "catch": shop.find("hp:genre/hp:catch", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text
+            },
+            "access": shop.find("hp:access", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text
+        }
