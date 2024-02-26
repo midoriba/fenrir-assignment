@@ -99,7 +99,7 @@
     border-radius: 10%;
     background-color: rgba(220, 222, 255, 0.668);
     margin: 5px 0;
-    padding: 0 10px;
+    padding: 0 5px;
     font-size: 15pt;
     border: 2px solid #ffffff;
 }
@@ -162,4 +162,8 @@ cursor: pointer;
 
 .pagination a:hover {
 background-color: #b32020;
+}
+
+.pagination .active  a{
+    background-color: #b32020;
 }
