@@ -11,10 +11,8 @@ const DetailPage = () => {
     }, [])
 
     const searchGourmetById = (latitude, longitude, range) => {
-        console.log("詳細取得")
         axios.get(`http://localhost:8000/local-gourmet/${id}`)
         .then((response) => {
-            console.log(JSON.stringify(response.data))
             setShop(response.data)
         })
     }

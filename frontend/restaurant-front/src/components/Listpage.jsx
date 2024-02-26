@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactPaginate from "react-paginate"
 import axios from "axios"
 import { useSearchParams, Link} from "react-router-dom";
 import "../css/main.css"
@@ -27,7 +28,6 @@ const GenreSelectButton = ({genres, onSelectedGenreChange}) => {
     
     const handleClick = () => {
         setIsActive((prev) => !prev)
-        console.log('genre clicked')
     }
 
     const onButtonClicked = (name, isSelected) => {
@@ -38,7 +38,6 @@ const GenreSelectButton = ({genres, onSelectedGenreChange}) => {
         <div className="genre-select">
             <div className={isActive ? "genre-list" : "genre-list invisible"}>
                 {genres.map((genre) => {
-                    console.log(genre.name)    
                     return <GenreCard genre={genre} key={genre.name} onButtonClicked={onButtonClicked} />
                 })}
             </div>
@@ -51,7 +50,6 @@ const GenreSelectButton = ({genres, onSelectedGenreChange}) => {
 
 const ShopCard = (props) => {
     const shop = props.shop
-    console.log(JSON.stringify(props.shop))
     return (
         <div className="shop-card">
             <p className="shop-name">{shop.name}</p>
@@ -66,22 +64,22 @@ const ShopCard = (props) => {
 const ListPage = () => {
     const [shops, setShops] = useState([])
     const [genres, setGenres] = useState([])
+    const [shopCount, setShopCount] = useState(0)
     const [genreVisibility, setGenreVisibility] = useState({"all": false})
+    const [start, setStart] = useState(0)
     const [searchParams] = useSearchParams()
     
     useEffect(() => {
-        console.log(searchParams)
-        console.log(`取った ${searchParams.get("latitude")}, ${searchParams.get("longitude")}`)
-        searchGourmetByPosition(searchParams.get("latitude"), searchParams.get("longitude"), searchParams.get("range"))
-    }, [])
+        searchGourmetByPosition(start, searchParams.get("latitude"), searchParams.get("longitude"), searchParams.get("range"))
+    }, [start])
 
-    const searchGourmetByPosition = (latitude, longitude, range) => {
-        console.log("検索実行")
+    const searchGourmetByPosition = (start, latitude, longitude, range) => {
         axios.get("http://localhost:8000/local-gourmet", {
             params: {
                 latitude: latitude,
                 longitude: longitude,
-                search_range: range
+                search_range: range,
+                start: start
             }
         })
         .then((response) => {
@@ -93,6 +91,7 @@ const ListPage = () => {
                 response.data.genres.map((genre) => res[genre.name] = true)
                 return res
             })
+            setShopCount(response.data.count)
         })
     }
 
@@ -107,15 +106,29 @@ const ListPage = () => {
             return newState
         })
     }
+
+    const onPageChange = (data) => {
+        console.log(`pagechange: ${data.selected}`)
+        const pageNumber = data.selected
+        setStart(pageNumber*10)
+        searchGourmetByPosition(pageNumber*10, searchParams.get("latitude"), searchParams.get("longitude"), searchParams.get("range"))
+    }
     
     return (
         <div>
             { shops.map((shop) => {
-                console.log(shop.genre)
                 if (genreVisibility.all || genreVisibility[shop.genre.name]) {
                     return <ShopCard shop={shop} key={shop.name}/>
                 }
             }) }
+            <ReactPaginate
+                pageCount={Math.ceil(shopCount / 10)}
+                onPageChange={onPageChange}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                containerClassName="pagination"
+                activeClassName="active"
+            />
             <GenreSelectButton genres={genres} onSelectedGenreChange={onSelectedGenreChange}/>
         </div>
     )

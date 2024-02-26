@@ -24,12 +24,13 @@ async def root():
     return {"message": "Hello World"}
 
 @app.get("/local-gourmet")
-async def get_local_gourmet(latitude: float, longitude: float, search_range: int=1):
+async def get_local_gourmet(latitude: float, longitude: float, search_range: int, start: int):
     params = {
         "key": HOTPEPPER_API_KEY,
         "lat": latitude,
         "lng": longitude,
-        "range": search_range
+        "range": search_range,
+        "start": start
     }
     print(params)
     response = rq.get(GOURMET_API_URL, params=params).text
@@ -60,6 +61,8 @@ async def get_local_gourmet(latitude: float, longitude: float, search_range: int
             genre_counts[name] = 1
     genres = sorted([{"name": name, "count": count} for name, count in genre_counts.items()], key=lambda x: x["count"], reverse=True)
     result = {
+        "count": int(response_tree.find("./hp:results_available", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text),
+        "start": int(response_tree.find("./hp:results_start", {"hp": "http://webservice.recruit.co.jp/HotPepper/"}).text),
         "shops": shops,
         "genres": genres
     }

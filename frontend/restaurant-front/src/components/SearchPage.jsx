@@ -19,17 +19,14 @@ const SearchPage = () => {
     }
 
     const onGetPositionSuccess = (position) => {
-        console.log('位置情報取得成功')
         navigate(`/result?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}${generateQueryParameters(searchCondition)}`)
     }
 
     const onGetPositionError = (position) => {
-        console.log('位置情報取得エラー')
     } 
 
     const getPosition = () => {
         if (!navigator.geolocation) {
-            console.log('位置情報取得不可');
         } else {
             navigator.geolocation.getCurrentPosition(onGetPositionSuccess, onGetPositionError);
         }
@@ -54,6 +51,7 @@ const SearchPage = () => {
             <p className="search-heading">近くのレストランを見つけませんか</p>
             <div className="search-submit-button" onClick={onSubmit}><p>検索</p></div>
             <div className="search-conditions">
+                <p>半径</p>
                 <select onChange={onRangeChange}>
                     {rangeSelectItems.map((item) => <option value={item.value} key={item.value}>{item.tag}</option>)}
                 </select>
