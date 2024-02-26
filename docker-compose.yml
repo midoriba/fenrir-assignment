@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  api:
+    restart: always
+    hostname: api
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    tty: true
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-net
+  frontend:
+    restart: always
+    hostname: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    tty: true
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
